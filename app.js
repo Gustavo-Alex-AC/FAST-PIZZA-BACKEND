@@ -16,9 +16,10 @@ app.use("/api/pedidos", require("./routes/pedidoRoutes"));
 app.use("/api/pagamentos", require("./routes/pagamentoRoutes"));
 app.use("/api/tipopagamento", require("./routes/tipoPagamentoRoutes"));
 app.use("/api/ingredientes", require("./routes/ingredienteRoutes"));
+app.use("/api/carrinho", require("./routes/carrinhoRoutes"));
 
 // Teste se conectou
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({ alter: true }).then(() => {
   console.log("📦 DB sincronizado com Sequelize");
 });
 

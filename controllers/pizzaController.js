@@ -28,8 +28,8 @@ exports.getAllPizzas = async (req, res) => {
       id: pizza.id,
       name: pizza.nome,
       ingredients: pizza.ingredientes.map((i) => i.descricao), // 👈 mesmo alias aqui
-      soldOut: pizza.esgotado,
-      imageUrl: pizza.imagemUrl,
+      soldOut: pizza.soldOut,
+      imageUrl: pizza.imageUrl,
       unitPrice: pizza.preco,
       category: pizza.categoria?.descricao || null,
       size: pizza.tamanho?.descricao || null,
