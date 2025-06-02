@@ -30,6 +30,14 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "id_pedido",
       as: "pagamento",
     });
+
+    Pedido.belongsTo(models.Endereco, {
+      foreignKey: "id_endereco",
+      as: "endereco",
+    });
+
+    // Pedido.js
+    Pedido.hasMany(models.PedidoItem, { foreignKey: "id_pedido", as: "itens" });
   };
 
   return Pedido;

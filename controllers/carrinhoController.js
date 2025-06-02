@@ -80,12 +80,26 @@ exports.deleteItem = async (req, res) => {
   }
 };
 
-// DELETE /api/carrinho
-exports.delete = async (req, res) => {
+// Limpar carrinho de um utilizador
+exports.limparCarrinho = async (req, res) => {
   try {
-    await Carrinho.destroy({ where: {} });
-    res.status(204).end();
+    const { id_usuario } = req.params;
+
+    if (!id_usuario) {
+      return res.status(400).json({ message: "ID do usuário é obrigatório." });
+    }
+
+    const deletedRows = await Carrinho.destroy({ where: { id_usuario } });
+
+    if (deletedRows === 0) {
+      return res
+        .status(404)
+        .json({ message: "Carrinho não encontrado para este usuário." });
+    }
+
+    res.status(204).end(); // Sucesso, sem conteúdo
   } catch (error) {
+    console.error("Erro ao limpar carrinho:", error);
     res.status(500).json({ message: "Erro ao limpar carrinho", error });
   }
 };

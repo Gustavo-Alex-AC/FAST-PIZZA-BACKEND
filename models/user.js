@@ -27,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "id_usuario",
       as: "pedidos",
     });
+
+    Usuario.hasMany(models.Endereco, {
+      foreignKey: "id_usuario",
+      as: "endereco", // pode manter esse alias se quiser
+    });
   };
 
   return Usuario;

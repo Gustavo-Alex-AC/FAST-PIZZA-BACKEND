@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/pedidoController");
 
-router.get("/", controller.getAllPedidos);
-router.get("/:id", controller.getPedidoById);
-router.post("/", controller.createPedido);
-router.put("/:id", controller.updatePedido);
-router.delete("/:id", controller.deletePedido);
+router.post("/", controller.criarPedido);
+router.get("/", controller.listarPedidos);
+router.get("/:id", controller.buscarPedido);
+router.put("/:id", controller.atualizarPedido);
+router.delete("/:id", controller.excluirPedido);
 
 module.exports = router;
