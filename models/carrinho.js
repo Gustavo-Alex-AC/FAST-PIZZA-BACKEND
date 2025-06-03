@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+     id_usuario: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   });
 
   Carrinho.associate = (models) => {
@@ -15,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
     Carrinho.belongsTo(models.Pedido, {
       foreignKey: "id_pedido",
       as: "pedido",
+    });
+
+    Carrinho.belongsTo(models.Usuario, {
+      foreignKey: "id_usuario",
+      as: "usuario",
     });
   };
 

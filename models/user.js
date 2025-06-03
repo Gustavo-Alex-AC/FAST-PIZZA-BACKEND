@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "id_usuario",
       as: "endereco", // pode manter esse alias se quiser
     });
+    Usuario.hasMany(models.Carrinho, {
+      foreignKey: "id_usuario",
+      as: "carrinho", // pode manter esse alias se quiser
+    });
   };
 
   return Usuario;

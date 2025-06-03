@@ -1,4 +1,4 @@
-const { Carrinho, Pizza } = require("../models");
+const { Carrinho, Pizza, Pedido } = require("../models");
 
 // GET /api/carrinho
 exports.getCarrinho = async (req, res) => {
@@ -27,11 +27,11 @@ exports.getCarrinho = async (req, res) => {
 
 // POST /api/carrinho
 exports.addItem = async (req, res) => {
-  const { pizzaId, quantity } = req.body;
+  const { pizzaId, quantity, userId } = req.body;
 
   try {
     const [item, created] = await Carrinho.findOrCreate({
-      where: { id_pizza: pizzaId },
+      where: { id_pizza: pizzaId, id_usuario: userId },
       defaults: { quantidade: quantity },
     });
 
@@ -42,9 +42,32 @@ exports.addItem = async (req, res) => {
 
     res.status(201).json({ message: "Item adicionado", item });
   } catch (err) {
-    res.status(500).json({ message: "Erro ao adicionar item", error: err });
+    console.error("Erro ao adicionar item:", err);
+    res
+      .status(500)
+      .json({ message: "Erro ao adicionar item", error: err.message });
   }
 };
+
+// exports.addItem = async (req, res) => {
+//   const { pizzaId, quantity, userId } = req.body;
+
+//   try {
+//     const [item, created] = await Carrinho.findOrCreate({
+//       where: { id_pizza: pizzaId, id_usuario: userId },
+//       defaults: { quantidade: quantity },
+//     });
+
+//     if (!created) {
+//       item.quantidade += quantity;
+//       await item.save();
+//     }
+
+//     res.status(201).json({ message: "Item adicionado", item });
+//   } catch (err) {
+//     res.status(500).json({ message: "Erro ao adicionar item", error: err });
+//   }
+// };
 
 // PATCH /api/carrinho/:pizzaId
 exports.updateQuantity = async (req, res) => {
@@ -80,6 +103,16 @@ exports.deleteItem = async (req, res) => {
   }
 };
 
+exports.delete = async (req, res) => {
+  try {
+    await Carrinho.destroy({ where: {} });
+
+    res.json({ message: "Item removido com sucesso" });
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao remover item", error: err });
+  }
+};
+
 // Limpar carrinho de um utilizador
 exports.limparCarrinho = async (req, res) => {
   try {
@@ -89,15 +122,15 @@ exports.limparCarrinho = async (req, res) => {
       return res.status(400).json({ message: "ID do usuário é obrigatório." });
     }
 
-    const deletedRows = await Carrinho.destroy({ where: { id_usuario } });
+    const deleted = await Carrinho.destroy({ where: { id_usuario } });
 
-    if (deletedRows === 0) {
+    if (deleted === 0) {
       return res
         .status(404)
-        .json({ message: "Carrinho não encontrado para este usuário." });
+        .json({ message: "Carrinho já está vazio para este usuário." });
     }
 
-    res.status(204).end(); // Sucesso, sem conteúdo
+    res.status(204).end();
   } catch (error) {
     console.error("Erro ao limpar carrinho:", error);
     res.status(500).json({ message: "Erro ao limpar carrinho", error });

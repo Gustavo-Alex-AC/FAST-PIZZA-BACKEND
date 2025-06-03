@@ -7,5 +7,6 @@ router.post("/", carrinhoController.addItem);
 router.patch("/:pizzaId", carrinhoController.updateQuantity);
 router.delete("/limpar/:id_usuario", carrinhoController.limparCarrinho);
 router.delete("/:pizzaId", carrinhoController.deleteItem);
+router.delete("/", carrinhoController.delete);
 
 module.exports = router;
