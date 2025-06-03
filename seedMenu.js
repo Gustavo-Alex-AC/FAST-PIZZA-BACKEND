@@ -25,20 +25,62 @@ const pizzasData = [
     soldOut: true,
     descricao: "Pizza clássica com presunto e cogumelos",
   },
+  {
+    nome: "Quatro Queijos",
+    preco: 15.0,
+    imagem:
+      "https://dclaevazetcjjkrzczpc.supabase.co/storage/v1/object/public/pizzas/pizza-3.jpg",
+    ingredientes: ["mozzarella", "gorgonzola", "parmesan", "emmental"],
+    soldOut: false,
+    descricao: "Combinação deliciosa de quatro tipos de queijo",
+  },
+  {
+    nome: "Pepperoni",
+    preco: 13.5,
+    imagem:
+      "https://dclaevazetcjjkrzczpc.supabase.co/storage/v1/object/public/pizzas/pizza-4.jpg",
+    ingredientes: ["tomato", "mozzarella", "pepperoni"],
+    soldOut: false,
+    descricao: "A clássica pizza americana com fatias de pepperoni",
+  },
+  {
+    nome: "Vegetariana",
+    preco: 13.0,
+    imagem:
+      "https://dclaevazetcjjkrzczpc.supabase.co/storage/v1/object/public/pizzas/pizza-5.jpg",
+    ingredientes: ["tomato", "mozzarella", "bell pepper", "onion", "olive"],
+    soldOut: false,
+    descricao: "Pizza leve com vegetais frescos e saborosos",
+  },
+  {
+    nome: "Frango com Catupiry",
+    preco: 14.5,
+    imagem:
+      "https://dclaevazetcjjkrzczpc.supabase.co/storage/v1/object/public/pizzas/pizza-6.jpg",
+    ingredientes: ["mozzarella", "chicken", "catupiry"],
+    soldOut: false,
+    descricao: "Pizza brasileira com frango desfiado e catupiry cremoso",
+  },
 ];
 
 async function seedPizzaNormalized() {
   try {
     await sequelize.sync({ force: true });
 
-    // Categoria table - category for pizzas
-    const categoriaPizza = await Categoria.create({
+    // Categorias
+    const categoriaVegetariana = await Categoria.create({
       descricao: "Vegetariana",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    // Tamanho table - size
+    const categoriaTradicional = await Categoria.create({
+      descricao: "Tradicional",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Tamanhos
     const tamanhoMedia = await Tamanho.create({
       descricao: "Média",
       createdAt: new Date(),
@@ -50,7 +92,7 @@ async function seedPizzaNormalized() {
       updatedAt: new Date(),
     });
 
-    // Ingrediente table - unique ingredients
+    // Ingredientes únicos
     const uniqueIngredientes = new Set();
     pizzasData.forEach((pizza) =>
       pizza.ingredientes.forEach((ing) => uniqueIngredientes.add(ing))
@@ -66,13 +108,16 @@ async function seedPizzaNormalized() {
       ingredienteMap[descricao] = ingrediente;
     }
 
-    // Pizza table - pizzas with relations and all fields
+    // Inserir pizzas
     for (const pizzaData of pizzasData) {
-      // Create pizza for each size to illustrate normalization
+      const isVeg = pizzaData.nome.toLowerCase().includes("vegetariana");
+      const categoria = isVeg ? categoriaVegetariana : categoriaTradicional;
+
+      // Média
       const pizzaMedia = await Pizza.create({
         nome: pizzaData.nome,
         preco: pizzaData.preco,
-        id_categoria: categoriaPizza.id,
+        id_categoria: categoria.id,
         id_tamanho: tamanhoMedia.id,
         imageUrl: pizzaData.imagem,
         soldOut: pizzaData.soldOut,
@@ -81,21 +126,20 @@ async function seedPizzaNormalized() {
         updatedAt: new Date(),
       });
 
-      // Add ingredients association
       const ingredientesToAdd = pizzaData.ingredientes.map(
         (ing) => ingredienteMap[ing].id
       );
       await pizzaMedia.addIngredientes(ingredientesToAdd);
 
-      // Create a large version for demonstration
+      // Grande
       const pizzaGrande = await Pizza.create({
         nome: pizzaData.nome + " Grande",
-        preco: pizzaData.preco * 1.5, // example bigger price
-        id_categoria: categoriaPizza.id,
+        preco: (pizzaData.preco * 1.5).toFixed(2),
+        id_categoria: categoria.id,
         id_tamanho: tamanhoGrande.id,
         imageUrl: pizzaData.imagem,
         soldOut: pizzaData.soldOut,
-        descricao: pizzaData.descricao + " tamanho grande",
+        descricao: pizzaData.descricao + " em tamanho grande",
         createdAt: new Date(),
         updatedAt: new Date(),
       });

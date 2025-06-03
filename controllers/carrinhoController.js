@@ -25,6 +25,38 @@ exports.getCarrinho = async (req, res) => {
   }
 };
 
+exports.getCarrinhoById = async (req, res) => {
+  const { id_usuario } = req.params; // ou req.query.id_usuario
+
+  if (!id_usuario) {
+    return res.status(400).json({ message: "id_usuario é obrigatório" });
+  }
+
+  try {
+    const items = await Carrinho.findAll({
+      where: { id_usuario },
+      include: {
+        model: Pizza,
+        as: "pizza",
+        attributes: ["id", "nome", "preco", "imageUrl"],
+      },
+    });
+
+    const cart = items.map((item) => ({
+      pizzaId: item.pizza.id,
+      name: item.pizza.nome,
+      quantity: item.quantidade,
+      totalPrice: item.quantidade * parseFloat(item.pizza.preco),
+      imageUrl: item.pizza.imageUrl,
+    }));
+
+    res.json(cart);
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao obter carrinho", error: err });
+  }
+};
+
+
 // POST /api/carrinho
 exports.addItem = async (req, res) => {
   const { pizzaId, quantity, userId } = req.body;
