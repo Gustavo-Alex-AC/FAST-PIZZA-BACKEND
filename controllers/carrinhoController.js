@@ -124,19 +124,28 @@ exports.updateQuantity = async (req, res) => {
   }
 };
 
-// DELETE /api/carrinho/:pizzaId
 exports.deleteItem = async (req, res) => {
   const { pizzaId } = req.params;
+  const { userId } = req.query;
+
+  if (!userId) return res.status(400).json({ message: "userId é obrigatório" });
 
   try {
-    const result = await Carrinho.destroy({ where: { id_pizza: pizzaId } });
+    const result = await Carrinho.destroy({
+      where: {
+        id_pizza: pizzaId,
+        id_usuario: userId, // só apaga se for o dono
+      },
+    });
 
     if (result === 0)
-      return res.status(404).json({ message: "Item não encontrado" });
+      return res
+        .status(404)
+        .json({ message: "Item não encontrado ou não pertence ao usuário" });
 
-    res.json({ message: "Item removido" });
+    res.json({ message: "Item removido com sucesso" });
   } catch (err) {
-    res.status(500).json({ message: "Erro ao remover", error: err });
+    res.status(500).json({ message: "Erro ao remover item", error: err });
   }
 };
 
