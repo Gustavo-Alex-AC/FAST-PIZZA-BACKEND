@@ -56,10 +56,15 @@ exports.getCarrinhoById = async (req, res) => {
   }
 };
 
-
 // POST /api/carrinho
+// controllers/cartController.js
+
 exports.addItem = async (req, res) => {
   const { pizzaId, quantity, userId } = req.body;
+
+  if (!pizzaId || !quantity || !userId) {
+    return res.status(400).json({ message: "Dados incompletos" });
+  }
 
   try {
     const [item, created] = await Carrinho.findOrCreate({
@@ -72,7 +77,7 @@ exports.addItem = async (req, res) => {
       await item.save();
     }
 
-    res.status(201).json({ message: "Item adicionado", item });
+    res.status(201).json({ message: "Item adicionado ao carrinho", item });
   } catch (err) {
     console.error("Erro ao adicionar item:", err);
     res
